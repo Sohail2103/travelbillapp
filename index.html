@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Travel Bill Generator</title>
+<style>
+  :root {
+    --navy: #0b1f3a;
+    --navy-light: #142b4d;
+    --gold: #c9a227;
+    --bg: #f4f2ec;
+    --border: #e2ddcb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 0;
+    color: #222;
+  }
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 24px 32px;
+    border-bottom: 4px solid var(--gold);
+  }
+  header h1 { margin: 0; font-size: 24px; }
+  header p { margin: 4px 0 0; color: var(--gold); font-size: 14px; }
+  .layout {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  form {
+    flex: 1 1 420px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+  fieldset {
+    border: none;
+    border-top: 1px solid var(--border);
+    padding: 12px 0 0;
+    margin: 0 0 16px;
+  }
+  legend {
+    font-weight: 600;
+    color: var(--navy);
+    padding: 0 4px 0 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .field { flex: 1 1 160px; display: flex; flex-direction: column; }
+  label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 4px; }
+  input, select, textarea {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 50px; }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  button:hover { background: var(--navy-light); }
+  .preview {
+    flex: 1 1 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .preview img {
+    max-width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .placeholder {
+    color: #999;
+    text-align: center;
+    padding: 60px 20px;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    width: 100%;
+  }
+  .download-btn {
+    display: none;
+    text-align: center;
+    text-decoration: none;
+    background: var(--gold);
+    color: var(--navy);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .whatsapp-btn {
+    display: none;
+    text-align: center;
+    text-decoration: none;
+    background: #25D366;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    width: 100%;
+  }
+  .btn-row { display: flex; gap: 10px; width: 100%; }
+  .hint {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    display: none;
+  }
+  .wm-section {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    padding: 0 24px;
+  }
+  .wm-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .wm-card h2 { margin: 0 0 4px; font-size: 16px; color: var(--navy); }
+  .wm-card .sub { font-size: 13px; color: #888; margin: 0 0 16px; }
+  .wm-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .wm-field { flex: 1 1 220px; display: flex; flex-direction: column; }
+  .wm-field label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 4px; }
+  .wm-field input {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  .wm-btn {
+    padding: 10px 20px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .wm-btn:hover { background: var(--navy-light); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Travel Bill Generator</h1>
+  <p>Generate a branded JPEG travel invoice / ticket receipt</p>
+  <p style="margin-top:8px"><a href="/pdf.html" style="color:#c9a227;font-size:13px;text-decoration:none;">Need a plain PDF letter instead? &rarr;</a></p>
+</header>
+
+<div class="layout">
+  <form id="billForm">
+    <fieldset>
+      <legend>Agency & Invoice</legend>
+      <div class="row">
+        <div class="field">
+          <label>Agency Name</label>
+          <input type="text" name="AgencyName" value="Mohamed Sohail Travels" required />
+        </div>
+        <div class="field">
+          <label>Invoice No</label>
+          <input type="text" name="InvoiceNo" placeholder="INV-0001" required />
+        </div>
+        <div class="field">
+          <label>Invoice Date</label>
+          <input type="date" name="InvoiceDate" required />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Passenger</legend>
+      <div class="row">
+        <div class="field">
+          <label>Passenger Name</label>
+          <input type="text" name="PassengerName" required />
+        </div>
+        <div class="field">
+          <label>PNR</label>
+          <input type="text" name="Pnr" required />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Flight</legend>
+      <div class="row">
+        <div class="field">
+          <label>Airline</label>
+          <input type="text" name="Airline" placeholder="AirAsia" required />
+        </div>
+        <div class="field">
+          <label>Flight No</label>
+          <input type="text" name="FlightNo" placeholder="AK123" required />
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>From (Code)</label>
+          <input type="text" name="From" placeholder="TRZ" required />
+        </div>
+        <div class="field">
+          <label>To (Code)</label>
+          <input type="text" name="To" placeholder="KUL" required />
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Travel Date</label>
+          <input type="date" name="TravelDate" required />
+        </div>
+        <div class="field">
+          <label>Departure Time</label>
+          <input type="time" name="TravelTime" required />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fare</legend>
+      <div class="row">
+        <div class="field">
+          <label>Currency</label>
+          <select name="Currency">
+            <option value="INR">INR</option>
+            <option value="MYR">MYR</option>
+            <option value="USD">USD</option>
+            <option value="SGD">SGD</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Base Fare</label>
+          <input type="number" step="0.01" name="BaseFare" value="0" required />
+        </div>
+        <div class="field">
+          <label>Taxes & Fees</label>
+          <input type="number" step="0.01" name="Taxes" value="0" required />
+        </div>
+        <div class="field">
+          <label>Total Amount</label>
+          <input type="number" step="0.01" name="Total" value="0" required />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Notes</legend>
+      <div class="field">
+        <textarea name="Notes" placeholder="Optional remarks..."></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Send to Client (optional)</legend>
+      <div class="field">
+        <label>Client WhatsApp Number (with country code)</label>
+        <input type="tel" id="whatsappNumber" placeholder="e.g. 919876543210" />
+      </div>
+    </fieldset>
+
+    <button type="submit">Generate JPEG Bill</button>
+  </form>
+
+  <div class="preview">
+    <div id="placeholder" class="placeholder">Fill the form and click "Generate JPEG Bill" to see the preview here.</div>
+    <img id="previewImg" style="display:none" />
+    <div class="btn-row">
+      <a id="downloadBtn" class="download-btn" download="travel-bill.jpg">Download JPEG</a>
+      <a id="whatsappBtn" class="whatsapp-btn" target="_blank" rel="noopener">Send via WhatsApp</a>
+    </div>
+    <div id="hint" class="hint">Downloading the bill now — attach it in the WhatsApp chat that opens.</div>
+  </div>
+</div>
+
+<div class="wm-section">
+  <div class="wm-card">
+    <h2>Remove Watermark from a PDF</h2>
+    <p class="sub">Upload an existing PDF (e.g. an e-ticket or letter exported from WPS Office) and get it back with the footer watermark whited out.</p>
+    <form id="wmForm">
+      <div class="wm-row">
+        <div class="wm-field">
+          <label>PDF File</label>
+          <input type="file" name="file" id="wmFileInput" accept="application/pdf" required />
+        </div>
+        <div class="wm-field" style="flex: 0 0 160px;">
+          <label>Strip height (pt)</label>
+          <input type="number" id="wmStripHeight" value="90" min="10" max="300" />
+        </div>
+        <button type="submit" class="wm-btn">Remove Watermark</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById('billForm');
+const previewImg = document.getElementById('previewImg');
+const placeholder = document.getElementById('placeholder');
+const downloadBtn = document.getElementById('downloadBtn');
+const whatsappBtn = document.getElementById('whatsappBtn');
+const hint = document.getElementById('hint');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const payload = Object.fromEntries(formData.entries());
+
+  const submitBtn = form.querySelector('button');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Generating...';
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/generate-bill', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to generate bill: ' + res.status);
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    previewImg.src = url;
+    previewImg.style.display = 'block';
+    placeholder.style.display = 'none';
+
+    downloadBtn.href = url;
+    downloadBtn.download = `travel-bill-${payload.InvoiceNo || 'draft'}.jpg`;
+    downloadBtn.style.display = 'inline-block';
+
+    // Build the WhatsApp click-to-chat link. wa.me can't attach files, so we
+    // auto-download the JPEG first, then open the chat with a ready message —
+    // the user just attaches the file WhatsApp already has waiting in Downloads.
+    const rawNumber = document.getElementById('whatsappNumber').value.trim();
+    const digitsOnly = rawNumber.replace(/[^0-9]/g, '');
+
+    const message = [
+      `Hi ${payload.PassengerName || ''}, here is your travel bill from ${payload.AgencyName || ''}.`,
+      `Invoice No: ${payload.InvoiceNo || ''}`,
+      `Flight: ${payload.Airline || ''} ${payload.FlightNo || ''} (${payload.From || ''} → ${payload.To || ''})`,
+      `Total: ${payload.Currency || ''} ${payload.Total || ''}`,
+      `(Attaching the bill image now)`
+    ].join('\n');
+
+    const waUrl = digitsOnly
+      ? `https://wa.me/${digitsOnly}?text=${encodeURIComponent(message)}`
+      : `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+    whatsappBtn.href = waUrl;
+    whatsappBtn.style.display = 'inline-block';
+    whatsappBtn.onclick = () => {
+      // trigger the JPEG download automatically so it's ready to attach
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = downloadBtn.download;
+      a.click();
+      hint.style.display = 'block';
+    };
+  } catch (err) {
+    alert('Error generating bill: ' + err.message);
+  } finally {
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
+
+document.getElementById('wmForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fileInput = document.getElementById('wmFileInput');
+  if (!fileInput.files.length) return;
+
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  formData.append('stripHeight', document.getElementById('wmStripHeight').value);
+
+  const btn = e.target.querySelector('button');
+  const originalText = btn.textContent;
+  btn.textContent = 'Processing...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/remove-watermark', { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('Failed: ' + res.status);
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const originalName = fileInput.files[0].name.replace(/\.pdf$/i, '');
+    a.download = `${originalName}-clean.pdf`;
+    a.click();
+  } catch (err) {
+    alert('Error removing watermark: ' + err.message);
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
